@@ -74,13 +74,13 @@ func changeParticularsScreen() {
 			mainCord = data.Batch.MainCord
 		}
 
-		//save the values to the data
-		data.Batch= data.BatchData{
+		// Save data to data.Batch and to JSON file
+		data.SaveData(data.BatchData{
 			Name:     name,
 			Trainer:  trainer,
 			MainCord: mainCord,
 			AsstCord: asstCord,
-		}
+		})
 
 		setHomeScreen()
 	})
