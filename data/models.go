@@ -36,6 +36,9 @@ var (
 		},
 	}
 
-	//initializing the BatchData with DefaultData
-	Batch BatchData = DefaultData
+	Batch BatchData
 )
+
+func init() {
+	Batch =LoadData()
+}

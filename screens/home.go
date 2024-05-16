@@ -1,6 +1,8 @@
 package screens
 
 import (
+	"strconv"
+
 	"github.com/AbdulRahimOM/report-maker-app/data"
 
 	"fyne.io/fyne/v2/container"
@@ -39,12 +41,29 @@ func setHomeScreen() {
 	)
 	batchDetailsSet := container.NewHBox(labelSet, valueSet)
 
-	//Reseting the home screen
-	setHomeScreen := container.NewVBox(
+	//Members List
+	membersListLabel := widget.NewLabel("Members: ")
+	membersListLabel.TextStyle.Bold = true
+	membersCtnrL := container.NewVBox()
+	gap := widget.NewLabel("      ")
+	membersCtnrR := container.NewVBox()
+	membersCtnr := container.NewHBox(membersCtnrL,gap, membersCtnrR)
+	strength := len(data.Batch.Members)
+	for i := 0; i <= strength/2; i++ {
+		membersCtnrL.Add(widget.NewLabel(strconv.Itoa(i+1) + ". " + data.Batch.Members[i]))
+	}
+	for i := strength/2 + 1; i < strength; i++ {
+		membersCtnrR.Add(widget.NewLabel(strconv.Itoa(i+1) + ". " + data.Batch.Members[i]))
+	}
+
+	newHomeScreen := container.NewVBox(
 		batchDetailsHeading,
 		batchDetailsSet,
+		widget.NewSeparator(),
+		membersListLabel,
+		membersCtnr,
 	)
 
-	loadContentScreen("", setHomeScreen)
+	loadContentScreen("", newHomeScreen)
 
 }
