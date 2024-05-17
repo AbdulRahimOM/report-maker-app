@@ -123,19 +123,18 @@ func makeSessionReportScreen() {
 		}
 	})
 
-	//data for report
-	sessionReportData := generateReport.SessionReportData{
-		DateText:   dateEntry.Text,
-		TimeText:   timeEntry.Text,
-		Activity:   activityEntry.Text,
-		TLDVLink:   tldvLinkEntry.Text,
-		Attendance: submissions,
-		ReportedBy: reportedByEntry.Text,
-		Summary:    summaryEntry.Text,
-	}
-
 	//preview button
 	previewButton := widget.NewButton("Preview", func() {
+		//data for preview
+		sessionReportData := generateReport.SessionReportData{
+			DateText:   dateEntry.Text,
+			TimeText:   timeEntry.Text,
+			Activity:   activityEntry.Text,
+			TLDVLink:   tldvLinkEntry.Text,
+			Attendance: submissions,
+			ReportedBy: reportedByEntry.Text,
+			Summary:    summaryEntry.Text,
+		}
 		report := generateReport.CreateSessionReport(data.DefaultData, sessionReportData)
 		showReportPreview(report)
 
@@ -144,6 +143,16 @@ func makeSessionReportScreen() {
 	//submit button
 	submitStatusLabel := widget.NewLabel("")
 	submitButton := widget.NewButton("Create report", func() {
+		//data for report
+		sessionReportData := generateReport.SessionReportData{
+			DateText:   dateEntry.Text,
+			TimeText:   timeEntry.Text,
+			Activity:   activityEntry.Text,
+			TLDVLink:   tldvLinkEntry.Text,
+			Attendance: submissions,
+			ReportedBy: reportedByEntry.Text,
+			Summary:    summaryEntry.Text,
+		}
 		report := generateReport.CreateSessionReport(data.DefaultData, sessionReportData)
 		tools.LogReport("Session Report", report)
 		tools.CopyToClipboard(report)
