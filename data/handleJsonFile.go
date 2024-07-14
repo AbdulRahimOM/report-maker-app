@@ -3,12 +3,53 @@ package data
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
+	"path/filepath"
+	"runtime"
 )
 
-var batchDataFile = "./data/batch-details.json"
+var batchDataFile string
+var relativeFilePathAndName = "data/batch-details.json"
 
+func init() {
+	var baseDir string
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatalf("Error getting home directory: %v", err)
+	}
+
+	switch runtime.GOOS {
+	case "darwin":
+		// macOS
+		baseDir = filepath.Join(homeDir, "Library", "Application Support", "Report-Maker-App")
+	case "linux":
+		// Linux
+		baseDir = filepath.Join(homeDir, ".Report-Maker-App")
+	case "windows":
+		// Windows
+		appDataDir := os.Getenv("APPDATA")
+		if appDataDir == "" {
+			log.Fatalf("Error getting AppData directory")
+		}
+		baseDir = filepath.Join(appDataDir, "Report-Maker-App")
+	default:
+		// log.Fatalf("Unsupported OS: %s", runtime.GOOS)
+		fmt.Println("Didn't recognize the OS. So, the current directory will be used to save config data.")
+		baseDir = filepath.Join(".", "Report-Maker-App")
+	}
+
+	// Create the full path to the data file
+	batchDataFile = filepath.Join(baseDir, relativeFilePathAndName)
+	fmt.Println("Data file path:", batchDataFile)
+}
 func SaveData(data BatchData) {
+	// Ensure the directory exists
+	dir := filepath.Dir(batchDataFile)
+	err := os.MkdirAll(dir, 0755)
+	if err != nil {
+		log.Fatalf("Error creating directory: %v", err)
+	}
 	Batch = data
 	// Marshal data to JSON
 	jsonData, err := json.Marshal(data)
