@@ -16,6 +16,7 @@ var selectionToggle bool = false
 
 func makeSessionReportScreen() {
 	var sessionReportContent *fyne.Container
+	var submissions []bool = make([]bool, len(data.Batch.Members))
 
 	//heading
 	headingLabel := widget.NewLabel("Create Session Report")
@@ -135,7 +136,7 @@ func makeSessionReportScreen() {
 			ReportedBy: reportedByEntry.Text,
 			Summary:    summaryEntry.Text,
 		}
-		report := generateReport.CreateSessionReport(data.DefaultData, sessionReportData)
+		report := generateReport.CreateSessionReport(data.Batch, sessionReportData)
 		showReportPreview(report)
 
 	})
@@ -153,7 +154,7 @@ func makeSessionReportScreen() {
 			ReportedBy: reportedByEntry.Text,
 			Summary:    summaryEntry.Text,
 		}
-		report := generateReport.CreateSessionReport(data.DefaultData, sessionReportData)
+		report := generateReport.CreateSessionReport(data.Batch, sessionReportData)
 		tools.LogReport("Session Report", report)
 		tools.CopyToClipboard(report)
 		submitStatusLabel.SetText("Report created successfully")

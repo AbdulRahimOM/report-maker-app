@@ -19,12 +19,14 @@ func setHomeScreen() {
 	trainerLabel := widget.NewLabel("Trainer: ")
 	mainCordLabel := widget.NewLabel("Main Coordinator: ")
 	asstCordLabel := widget.NewLabel("Asst Coordinator: ")
+	usualTimeLabel := widget.NewLabel("Usual Time: ")
 
 	//Value Labels
 	batchNameValueLabel := widget.NewLabel(data.Batch.Name)
 	trainerValueLabel := widget.NewLabel(data.Batch.Trainer)
 	mainCordValueLabel := widget.NewLabel(data.Batch.MainCord)
 	asstCordValueLabel := widget.NewLabel(data.Batch.AsstCord)
+	usualTimeValueLabel := widget.NewLabel(data.Batch.UsualTime)
 
 	//Grouping Labels and Value Labels
 	labelSet := container.NewVBox(
@@ -32,12 +34,14 @@ func setHomeScreen() {
 		trainerLabel,
 		mainCordLabel,
 		asstCordLabel,
+		usualTimeLabel,
 	)
 	valueSet := container.NewVBox(
 		batchNameValueLabel,
 		trainerValueLabel,
 		mainCordValueLabel,
 		asstCordValueLabel,
+		usualTimeValueLabel,
 	)
 	batchDetailsSet := container.NewHBox(labelSet, valueSet)
 

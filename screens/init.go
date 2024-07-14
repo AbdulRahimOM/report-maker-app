@@ -13,12 +13,12 @@ var (
 
 	splitScreen *container.Split
 	sidebar     *fyne.Container
-	spacer   = widget.NewLabel("")
+	spacer      = widget.NewLabel("")
 )
 
 func init() {
 	// Window settings
-	MyWindow.Resize(fyne.NewSize(600, 500))
+	MyWindow.Resize(fyne.NewSize(700, 500))
 
 	// Sidebar
 	sidebar = container.NewVBox(

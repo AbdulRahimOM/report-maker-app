@@ -12,9 +12,8 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-var submissions []bool = make([]bool, len(data.DefaultData.Members))
-
 func makeAudioReport() {
+	var submissions []bool = make([]bool, len(data.Batch.Members))
 	var audioReportScreenContent *fyne.Container
 
 	headingLabel := widget.NewLabel("Audio Report")

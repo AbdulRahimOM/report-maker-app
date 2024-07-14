@@ -6,7 +6,7 @@ type BatchData struct {
 	MainCord  string   `json:"mainCord"`
 	AsstCord  string   `json:"asstCord"`
 	UsualTime string   `json:"usualTime"`
-	TimeSlot  string   `json:"timeSlot"`
+	// TimeSlot  string   `json:"timeSlot"`
 	Members   []string `json:"members"`
 }
 
@@ -18,7 +18,7 @@ var (
 		MainCord:  "Abdul Rahim O M",
 		AsstCord:  "Afsal KT",
 		UsualTime: "3:00 PM",
-		TimeSlot:  "3:00 PM to 4:00 PM",
+		// TimeSlot:  "3:00 PM to 4:00 PM",
 		Members: []string{
 			"Shruthi Kiron",
 			"Abdul Rahim O M",

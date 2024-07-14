@@ -25,9 +25,9 @@ func linkScheduleScreen() {
 	dateEntry.SetText(time.Now().Format("January 02, 2006"))
 
 	//time slot
-	timeSlotLabel := widget.NewLabel("Time Slot")
+	timeSlotLabel := widget.NewLabel("Time")
 	timeSlotEntry := widget.NewEntry()
-	timeSlotEntry.SetText(data.DefaultData.TimeSlot)
+	timeSlotEntry.SetText(data.DefaultData.UsualTime)
 
 	//meeting link
 	linkLabel := widget.NewLabel("Link:")

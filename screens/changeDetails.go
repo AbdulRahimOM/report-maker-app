@@ -10,6 +10,7 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -43,12 +44,14 @@ func changeParticularsScreen() {
 	trainerLabel := widget.NewLabel("Trainer: ")
 	mainCordLabel := widget.NewLabel("Main Coordinator: ")
 	asstCordLabel := widget.NewLabel("Asst Coordinator: ")
+	usualTimeLabel := widget.NewLabel("Usual Time: ")
 
 	// Create input boxes
 	nameEntry := widget.NewEntry()
 	trainerEntry := widget.NewEntry()
 	mainCordEntry := widget.NewEntry()
 	asstCordEntry := widget.NewEntry()
+	usualTimeEntry := widget.NewEntry()
 	{ // Set the values/place-holders,etc of the input boxes
 		nameEntry.SetPlaceHolder("enter batch name here")
 		nameEntry.SetText(data.Batch.Name)
@@ -66,6 +69,9 @@ func changeParticularsScreen() {
 
 		asstCordEntry.SetPlaceHolder("enter asst coordinator name here")
 		asstCordEntry.SetText(data.Batch.AsstCord)
+
+		usualTimeEntry.SetPlaceHolder("enter usual time here")
+		usualTimeEntry.SetText(data.Batch.UsualTime)
 	}
 
 	// Grouping Labels and Value Labels
@@ -74,12 +80,14 @@ func changeParticularsScreen() {
 		trainerLabel,
 		mainCordLabel,
 		asstCordLabel,
+		usualTimeLabel,
 	)
 	inputSet := container.NewVBox(
 		nameEntry,
 		trainerEntry,
 		mainCordEntry,
 		asstCordEntry,
+		usualTimeEntry,
 	)
 	localSplit := container.NewHSplit(labelSet, inputSet)
 
@@ -89,19 +97,60 @@ func changeParticularsScreen() {
 
 	// Existing members
 	members := data.Batch.Members
-	var membersLabels []*widget.Label
+	// var membersLabels []*widget.Label
 	membersCtnrL := container.NewVBox()
 	membersCtnrR := container.NewVBox()
 	gap := widget.NewLabel("      ")
 	membersCtnr := container.NewHBox(membersCtnrL, gap, membersCtnrR)
 	strength := len(members)
-	for i := 0; i <= strength/2; i++ {
-		membersLabels = append(membersLabels, widget.NewLabel(strconv.Itoa(i+1)+". "+members[i]))
-		membersCtnrL.Add(membersLabels[i])
-	}
-	for i := strength/2 + 1; i < strength; i++ {
-		membersLabels = append(membersLabels, widget.NewLabel(strconv.Itoa(i+1)+". "+members[i]))
-		membersCtnrR.Add(membersLabels[i])
+
+	//Members being removed
+	removedMembersLabel := widget.NewLabel("Members being removed:")
+	removedMembersLabel.TextStyle.Bold = true
+	removedMembersLabel.Hide()
+	// var removedMembersLabels []*widget.Label
+	// var removedMembers []string
+	removedMembersCtnr := container.NewVBox()
+
+	var membersRemovalStatus []bool = make([]bool, strength)
+	var removedMembersLabels []*widget.Label = make([]*widget.Label, strength)
+
+	removalCount := 0	//for toggling show/hide of 'removedMembersLabel'
+	for i := 0; i < strength; i++ {
+		index := i
+		membersLabel := widget.NewLabel(strconv.Itoa(i+1) + ". " + members[i])
+		var removeButton *widget.Button
+		removedMembersLabels[i] = widget.NewLabel(strconv.Itoa(i+1) + ". " + members[i])
+		removeButton = widget.NewButtonWithIcon("", theme.DeleteIcon(), func() {
+			if !membersRemovalStatus[index] {
+				removedMembersCtnr.Add(removedMembersLabels[index])
+				removeButton.SetIcon(theme.ViewRefreshIcon())
+				membersRemovalStatus[index] = true
+				removalCount++
+				removedMembersLabel.Show()
+			} else {
+				removedMembersCtnr.Remove(removedMembersLabels[index])
+				removeButton.SetIcon(theme.DeleteIcon())
+				membersRemovalStatus[index] = false
+
+				removalCount--
+				if removalCount == 0 {
+					removedMembersLabel.Hide()
+				}
+			}
+		})
+
+		// Arrange label and button in a horizontal box
+		labelAndButton := container.NewHBox(
+			// label,
+			removeButton,
+			membersLabel,
+		)
+		if i <= strength/2 {
+			membersCtnrL.Add(labelAndButton)
+		} else {
+			membersCtnrR.Add(labelAndButton)
+		}
 	}
 
 	// Add new members
@@ -115,14 +164,14 @@ func changeParticularsScreen() {
 	addMemberEntryCtnr := container.New(customLayout, addMemberEntry)
 
 	// Members being added
-	var newMemberNames []*widget.Label
+	var newMemberNamesLabels []*widget.Label
+	var newMembers []string
 	newMembersCtnr := container.NewVBox()
-
-	//plus button
-	plusButton := widget.NewButton("+", func() {
+	addButton := widget.NewButtonWithIcon("Add", theme.ContentAddIcon(), func() {
 		if tools.ValidateName(addMemberEntry.Text) {
-			newMemberNames = append(newMemberNames, widget.NewLabel(strconv.Itoa(len(membersLabels)+len(newMemberNames)+1)+". "+addMemberEntry.Text))
-			newMembersCtnr.Add(newMemberNames[len(newMemberNames)-1])
+			newMembers = append(newMembers, addMemberEntry.Text)
+			newMemberNamesLabels = append(newMemberNamesLabels, widget.NewLabel(strconv.Itoa(len(members)+len(newMemberNamesLabels)+1)+". "+addMemberEntry.Text))
+			newMembersCtnr.Add(newMemberNamesLabels[len(newMemberNamesLabels)-1])
 			addMemberEntry.SetText("")
 		} else {
 			inputInfoLabel.Show()
@@ -135,33 +184,30 @@ func changeParticularsScreen() {
 
 	// Create a submit button
 	submitButton := widget.NewButton("Submit", func() {
-		// Get the values from the input boxes
-		name := nameEntry.Text
-		trainer := trainerEntry.Text
-		mainCord := mainCordEntry.Text
-		asstCord := asstCordEntry.Text
-		for _, member := range newMemberNames {
-			members = append(members, member.Text)
+
+		updatedMembers := []string{}
+		//remove members in delete list
+		for i := 0; i < strength; i++ {
+			if !membersRemovalStatus[i] {
+				updatedMembers = append(updatedMembers, members[i])
+			}
 		}
+		// adding new members to the existing members
+		updatedMembers = append(updatedMembers, newMembers...)
 
 		// Check if the values are empty
-		if name == "" {
-			name = data.Batch.Name
-		}
-		if trainer == "" {
-			trainer = data.Batch.Trainer
-		}
-		if mainCord == "" {
-			mainCord = data.Batch.MainCord
+		if nameEntry.Text == "" {
+			nameEntry.Text = data.Batch.Name
 		}
 
 		// Save data to data.Batch and to JSON file
 		data.SaveData(data.BatchData{
-			Name:     name,
-			Trainer:  trainer,
-			MainCord: mainCord,
-			AsstCord: asstCord,
-			Members:  members,
+			Name:      nameEntry.Text,
+			Trainer:   trainerEntry.Text,
+			MainCord:  mainCordEntry.Text,
+			AsstCord:  asstCordEntry.Text,
+			UsualTime: usualTimeEntry.Text,
+			Members:   updatedMembers,
 		})
 
 		setHomeScreen()
@@ -178,13 +224,16 @@ func changeParticularsScreen() {
 		membersCtnr,
 		seperator,
 
+		removedMembersLabel,
+		removedMembersCtnr,
+
 		container.NewHBox(
 			addMemberLabel,
 			inputInfoLabel,
 		),
 		container.NewHBox(
 			addMemberEntryCtnr,
-			plusButton,
+			addButton,
 		),
 		newMembersCtnr,
 		seperator,
